@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "ResourceModel.h"
+#include "modplatform/ModrinthMirror.h"
+#include "modplatform/modrinth/ModrinthAPI.h"
 
 #include <QCryptographicHash>
 #include <QIcon>
@@ -519,6 +521,45 @@ void ResourceModel::searchRequestAborted()
 }
 
 void ResourceModel::versionRequestSucceeded(QVector<ModPlatform::IndexedVersion>& doc, const QVariant& pack, const QModelIndex& index)
+{
+    // Nitruran: CurseForge versions without a download URL (third-party distribution disabled by the author) are hidden
+    // by optedOut(). If the byte-identical file (same SHA-1) exists on Modrinth, use that copy instead.
+    if (APPLICATION->settings()->get("FallbackMRBlockedMods").toBool()) {
+        const QStringList hashes = ModrinthMirror::blockedHashes(doc);
+        if (!hashes.isEmpty()) {
+            auto [task, response] = ModrinthAPI::currentVersions(hashes, "sha1");
+            m_mirrorTasks.append(task);
+            Task* raw = task.get();
+            const QVector<ModPlatform::IndexedVersion> original = doc;
+            const QPersistentModelIndex pIndex(index);
+            auto release = [this, raw] {
+                // drop our reference after the signal handler returns
+                QMetaObject::invokeMethod(
+                    this,
+                    [this, raw] {
+                        m_mirrorTasks.removeIf([raw](const Task::Ptr& t) { return t.get() == raw; });
+                    },
+                    Qt::QueuedConnection);
+            };
+            connect(raw, &Task::succeeded, this, [this, response, original, pack, pIndex, release]() {
+                auto versions = original;
+                const int filled = ModrinthMirror::fillBlocked(versions, ModrinthMirror::parseVersionFiles(*response));
+                qDebug() << "Modrinth mirror filled" << filled << "blocked CurseForge versions";
+                finishVersionRequest(versions, pack, QModelIndex(pIndex));
+                release();
+            });
+            connect(raw, &Task::failed, this, [this, original, pack, pIndex, release](const QString&) {
+                finishVersionRequest(original, pack, QModelIndex(pIndex));
+                release();
+            });
+            task->start();
+            return;
+        }
+    }
+    finishVersionRequest(doc, pack, index);
+}
+
+void ResourceModel::finishVersionRequest(QVector<ModPlatform::IndexedVersion> doc, const QVariant& pack, const QModelIndex& index)
 {
     if (!index.isValid()) {
         return;

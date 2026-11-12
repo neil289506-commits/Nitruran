@@ -146,12 +146,16 @@ class ResourceModel : public QAbstractListModel {
     void searchRequestAborted();
 
     void versionRequestSucceeded(QVector<ModPlatform::IndexedVersion>&, const QVariant&, const QModelIndex&);
+    void finishVersionRequest(QVector<ModPlatform::IndexedVersion> doc, const QVariant& pack, const QModelIndex& index);
 
     void infoRequestSucceeded(ModPlatform::IndexedPack::Ptr, const QModelIndex&);
 
    signals:
     void versionListUpdated(const QModelIndex& index);
     void projectInfoUpdated(const QModelIndex& index);
+
+   private:
+    QList<Task::Ptr> m_mirrorTasks;  // Nitruran: pending Modrinth lookups for blocked CurseForge versions
 };
 
 }  // namespace ResourceDownload

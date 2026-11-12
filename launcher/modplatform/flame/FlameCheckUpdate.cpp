@@ -1,4 +1,6 @@
 #include "FlameCheckUpdate.h"
+#include "modplatform/ModrinthMirror.h"
+#include "modplatform/modrinth/ModrinthAPI.h"
 #include "Application.h"
 #include "FlameAPI.h"
 #include "FlameModIndex.h"
@@ -100,11 +102,17 @@ void FlameCheckUpdate::getLatestVersionCallback(Resource* resource, QByteArray* 
 
     if (latestVer->downloadUrl.isEmpty() && latestVer->fileId != resource->metadata()->fileId) {
         m_blocked[resource] = latestVer->fileId.toString();
+        m_blockedVersions.insert(resource, { pack, latestVer.value() });
         return;
     }
 
-    if (!latestVer->hash.isEmpty() &&
-        (resource->metadata()->hash != latestVer->hash || resource->status() == ResourceStatus::NotInstalled)) {
+    registerUpdate(resource, pack, latestVer.value());
+}
+
+void FlameCheckUpdate::registerUpdate(Resource* resource, const ModPlatform::IndexedPack::Ptr& pack, const ModPlatform::IndexedVersion& latestVer)
+{
+    if (!latestVer.hash.isEmpty() &&
+        (resource->metadata()->hash != latestVer.hash || resource->status() == ResourceStatus::NotInstalled)) {
         auto oldVersion = resource->metadata()->versionNumber;
         if (oldVersion.isEmpty()) {
             if (resource->status() == ResourceStatus::NotInstalled) {
@@ -114,15 +122,47 @@ void FlameCheckUpdate::getLatestVersionCallback(Resource* resource, QByteArray* 
             }
         }
 
-        auto downloadTask = makeShared<ResourceDownloadTask>(pack, latestVer.value(), m_resourceModel, true, "update");
-        m_updates.emplace_back(pack->name, resource->metadata()->hash, oldVersion, latestVer->version, latestVer->versionType,
-                               FlameAPI::getModFileChangelog(latestVer->addonId.toInt(), latestVer->fileId.toInt()),
+        auto downloadTask = makeShared<ResourceDownloadTask>(pack, latestVer, m_resourceModel, true, "update");
+        m_updates.emplace_back(pack->name, resource->metadata()->hash, oldVersion, latestVer.version, latestVer.versionType,
+                               FlameAPI::getModFileChangelog(latestVer.addonId.toInt(), latestVer.fileId.toInt()),
                                ModPlatform::ResourceProvider::FLAME, downloadTask, resource->enabled());
     }
-    m_deps.append(std::make_shared<GetModDependenciesTask::PackDependency>(pack, latestVer.value()));
+    m_deps.append(std::make_shared<GetModDependenciesTask::PackDependency>(pack, latestVer));
 }
 
+// Nitruran: before reporting blocked updates, look for byte-identical files (same SHA-1) on Modrinth.
 void FlameCheckUpdate::collectBlockedMods()
+{
+    if (APPLICATION->settings()->get("FallbackMRBlockedMods").toBool() && !m_blockedVersions.isEmpty()) {
+        QVector<ModPlatform::IndexedVersion> versions;
+        for (const auto& entry : std::as_const(m_blockedVersions))
+            versions.append(entry.second);
+        const QStringList hashes = ModrinthMirror::blockedHashes(versions);
+        if (!hashes.isEmpty()) {
+            auto [task, response] = ModrinthAPI::currentVersions(hashes, "sha1");
+            m_mirrorTask = task;
+            connect(task.get(), &Task::succeeded, this, [this, response]() {
+                const auto mirrors = ModrinthMirror::parseVersionFiles(*response);
+                const auto resources = m_blockedVersions.keys();
+                for (auto* resource : resources) {
+                    auto entry = m_blockedVersions.value(resource);
+                    QVector<ModPlatform::IndexedVersion> one{ entry.second };
+                    if (ModrinthMirror::fillBlocked(one, mirrors) == 0)
+                        continue;
+                    m_blocked.remove(resource);
+                    registerUpdate(resource, entry.first, one.first());
+                }
+                reportBlockedMods();
+            });
+            connect(task.get(), &Task::failed, this, [this](const QString&) { reportBlockedMods(); });
+            task->start();
+            return;
+        }
+    }
+    reportBlockedMods();
+}
+
+void FlameCheckUpdate::reportBlockedMods()
 {
     QStringList addonIds;
     QHash<QString, Resource*> quickSearch;
