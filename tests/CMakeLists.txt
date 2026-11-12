@@ -26,6 +26,8 @@ set(TEST_SOURCES
     CatPack_test.cpp
     XmlLogs_test.cpp
     Commandline_test.cpp
+    NitruranSync_test.cpp
+    ModrinthMirror_test.cpp
 )
 
 # NOTE(@getchoo): Very funny way of aliasing the Qt generated `main` test functions to respective filenames

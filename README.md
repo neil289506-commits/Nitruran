@@ -8,7 +8,13 @@ A Minecraft launcher with a modern, Modrinth-App-inspired interface, running on 
 > Early preview — Windows first.
 
 * Interface: left sidebar, instance cards, Home / Library (more pages in progress).
-* Core: Prism Launcher's instance, Java, mod-loader, account and launch logic, unchanged.
+* Core: Prism Launcher's instance, Java, mod-loader, account and launch logic.
+* **Blocked CurseForge mods**: when an author disables third-party downloads, Nitruran looks for the byte-identical
+  file (same SHA-1) on Modrinth and downloads that copy — in modpack installs (Prism already did this), in the mod
+  browser and in update checks (new). It never works around the author's restriction on CurseForge itself.
+* **First-run sync**: offers to import instances, accounts, icons and a few settings from Prism Launcher and
+  mlcmLauncher (copies only; nothing is overwritten). Also available from the sidebar.
+* Interface text in English, 繁體中文 and 简体中文 (Nitruran's own strings; Prism's translations still load as before).
 * Open source under GPL-3.0.
 
 ## Screenshots
@@ -24,7 +30,11 @@ A Minecraft launcher with a modern, Modrinth-App-inspired interface, running on 
 
 ## Build
 GitHub Actions builds Windows (MSVC, Qt 6.11.2) — see `.github/workflows/windows.yml`.
-Add the repository secret `MSA_CLIENT_ID` (your approved Microsoft/Mojang application ID) first.
+Add two repository secrets first (Settings → Secrets and variables → Actions):
+
+* `MSA_CLIENT_ID` — your Microsoft/Mojang-approved application ID.
+* `CURSEFORGE_API_KEY` — your CurseForge API key for applications. It is never stored in the source; the build embeds it
+  (anyone can extract an embedded key from a binary, so treat it as shared with your users).
 
 ## Credits and licence
 Nitruran is a fork of Prism Launcher (GPL-3.0, see `COPYING.md` and `LICENSE`), whose copyright

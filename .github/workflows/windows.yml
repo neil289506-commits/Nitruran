@@ -35,6 +35,8 @@ jobs:
       CMAKE_PRESET: ci
       # Repo secret: Settings > Secrets and variables > Actions > MSA_CLIENT_ID
       MSA_CLIENT_ID: ${{ secrets.MSA_CLIENT_ID }}
+      # Repo secret: your CurseForge API key made for applications (never commit it)
+      CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
 
     steps:
       - name: Checkout
@@ -43,10 +45,14 @@ jobs:
           submodules: true
           fetch-depth: 0
 
-      - name: Require Microsoft client ID
+      - name: Require secrets
         run: |
           if [ -z "$MSA_CLIENT_ID" ]; then
             echo "::error::Secret MSA_CLIENT_ID is not set. Add it under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          if [ -z "$CURSEFORGE_API_KEY" ]; then
+            echo "::error::Secret CURSEFORGE_API_KEY is not set. Add it under Settings > Secrets and variables > Actions."
             exit 1
           fi
 
@@ -64,6 +70,7 @@ jobs:
           cmake --preset "$CMAKE_PRESET" \
             -D VCPKG_HOST_TRIPLET="$VCPKG_TRIPLET" -D VCPKG_TARGET_TRIPLET="$VCPKG_TRIPLET" \
             -D Launcher_MSA_CLIENT_ID="$MSA_CLIENT_ID" \
+            -D Launcher_CURSEFORGE_API_KEY="$CURSEFORGE_API_KEY" \
             -D Launcher_APP_BINARY_NAME=nitruran \
             -D Launcher_BUG_TRACKER_URL="https://github.com/${{ github.repository }}/issues" \
             -D Launcher_WARNING_AS_ERROR=OFF

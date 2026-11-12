@@ -470,6 +470,8 @@ set(META_SOURCES
 set(API_SOURCES
     modplatform/ModIndex.h
     modplatform/ModIndex.cpp
+    modplatform/ModrinthMirror.h
+    modplatform/ModrinthMirror.cpp
     modplatform/ResourceType.h
     modplatform/ResourceType.cpp
 
@@ -815,6 +817,11 @@ SET(LAUNCHER_SOURCES
     ui/nitruran/InstanceCardDelegate.cpp
     ui/nitruran/LibraryPage.h
     ui/nitruran/LibraryPage.cpp
+    ui/nitruran/NitruranI18n.h
+    ui/nitruran/SyncService.h
+    ui/nitruran/SyncService.cpp
+    ui/nitruran/SyncDialog.h
+    ui/nitruran/SyncDialog.cpp
     ui/InstanceWindow.h
     ui/InstanceWindow.cpp
     ui/ViewLogWindow.h
