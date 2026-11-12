@@ -37,6 +37,11 @@ QScrollBar:vertical { width: 12px; } QScrollBar:horizontal { height: 12px; }
 QScrollBar::handle { background: #42444a; border-radius: 6px; min-height: 30px; min-width: 30px; }
 QScrollBar::handle:hover { background: #96a2b0; }
 QScrollBar::add-line, QScrollBar::sub-line { width: 0; height: 0; }
+QMenu { background: #27292e; color: #b0bac5; border: 1px solid rgba(193,190,209,0.12); border-radius: 12px; padding: 6px; }
+QMenu::item { padding: 7px 20px; border-radius: 8px; }
+QMenu::item:selected { background: rgba(27,217,106,0.25); color: #1bd96a; }
+QMenu::separator { height: 1px; background: #34363c; margin: 4px 8px; }
+QToolTip { background: #27292e; color: #ffffff; border: 1px solid rgba(193,190,209,0.12); border-radius: 8px; padding: 4px 8px; }
 #NitruranPrimary { background: #1bd96a; color: #000000; border: none; border-radius: 12px; padding: 8px 16px; font-weight: 600; }
 #NitruranPrimary:hover { background: #42e686; }
 )");
