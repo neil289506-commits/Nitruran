@@ -11,14 +11,17 @@
 #include <QPixmap>
 #include <QPushButton>
 #include <QStackedWidget>
+#include <QTimer>
 #include <QToolButton>
 #include <QVBoxLayout>
 
 #include "Application.h"
+#include "NitruranI18n.h"
 #include "NitruranStyle.h"
 #include "FileSystem.h"
 #include "InstanceList.h"
 #include "LibraryPage.h"
+#include "SyncDialog.h"
 #include "QObjectPtr.h"
 #include "modplatform/modrinth/ModrinthAPI.h"
 #include "settings/SettingsObject.h"
@@ -54,15 +57,17 @@ NitruranWindow::NitruranWindow(QWidget* parent) : QMainWindow(parent)
     m_navGroup = new QButtonGroup(this);
     m_navGroup->setExclusive(true);
 
-    auto* home = addNavButton(QStringLiteral("\u2302"), tr("Home"), tr("Home"), true);
-    auto* library = addNavButton(QStringLiteral("\u25A4"), tr("Library"), tr("Library"), true);
-    auto* discover = addNavButton(QStringLiteral("\u2315"), tr("Discover"), tr("Discover and add instances"), false);
+    auto* home = addNavButton(QStringLiteral("\u2302"), Nitruran::t("Home"), Nitruran::t("Home"), true);
+    auto* library = addNavButton(QStringLiteral("\u25A4"), Nitruran::t("Library"), Nitruran::t("Library"), true);
+    auto* discover = addNavButton(QStringLiteral("\u2315"), Nitruran::t("Discover"), Nitruran::t("Discover and add instances"), false);
     sv->addWidget(home);
     sv->addWidget(discover);
     sv->addWidget(library);
     sv->addStretch(1);
-    auto* accounts = addNavButton(QStringLiteral("\u263A"), tr("Accounts"), tr("Accounts"), false);
-    auto* settings = addNavButton(QStringLiteral("\u2699"), tr("Settings"), tr("Settings"), false);
+    auto* accounts = addNavButton(QStringLiteral("\u263A"), Nitruran::t("Accounts"), Nitruran::t("Accounts"), false);
+    auto* settings = addNavButton(QStringLiteral("\u2699"), Nitruran::t("Settings"), Nitruran::t("Settings"), false);
+    auto* sync = addNavButton(QStringLiteral("\u21BB"), Nitruran::t("Sync"), Nitruran::t("Sync from other launchers"), false);
+    sv->addWidget(sync);
     sv->addWidget(accounts);
     sv->addWidget(settings);
 
@@ -80,9 +85,9 @@ NitruranWindow::NitruranWindow(QWidget* parent) : QMainWindow(parent)
     auto* homePage = new QWidget(m_pages);
     auto* hp = new QVBoxLayout(homePage);
     hp->setContentsMargins(0, 0, 0, 0);
-    auto* hTitle = new QLabel(tr("Welcome back!"), homePage);
+    auto* hTitle = new QLabel(Nitruran::t("Welcome back!"), homePage);
     hTitle->setObjectName("NitruranTitle");
-    auto* hSub = new QLabel(tr("Jump back in"), homePage);
+    auto* hSub = new QLabel(Nitruran::t("Jump back in"), homePage);
     hSub->setObjectName("NitruranSub");
     hp->addWidget(hTitle);
     hp->addWidget(hSub);
@@ -95,9 +100,9 @@ NitruranWindow::NitruranWindow(QWidget* parent) : QMainWindow(parent)
     auto* lp = new QVBoxLayout(libPage);
     lp->setContentsMargins(0, 0, 0, 0);
     auto* lTop = new QHBoxLayout();
-    auto* lTitle = new QLabel(tr("Library"), libPage);
+    auto* lTitle = new QLabel(Nitruran::t("Library"), libPage);
     lTitle->setObjectName("NitruranTitle");
-    auto* newBtn = new QPushButton(tr("New instance"), libPage);
+    auto* newBtn = new QPushButton(Nitruran::t("New instance"), libPage);
     newBtn->setObjectName("NitruranPrimary");
     lTop->addWidget(lTitle);
     lTop->addStretch(1);
@@ -115,7 +120,10 @@ NitruranWindow::NitruranWindow(QWidget* parent) : QMainWindow(parent)
     connect(accounts, &QToolButton::clicked, this, [this] { APPLICATION->ShowGlobalSettings(this, "accounts"); });
     connect(settings, &QToolButton::clicked, this, [this] { APPLICATION->ShowGlobalSettings(this); });
 
+    connect(sync, &QToolButton::clicked, this, [this] { SyncDialog(this).exec(); });
+
     home->setChecked(true);
+    QTimer::singleShot(800, this, &NitruranWindow::offerSyncOnFirstRun);
 }
 
 NitruranWindow::~NitruranWindow() = default;
@@ -164,7 +172,7 @@ void NitruranWindow::checkInstancePathForProblems()
     const QString instanceFolder = APPLICATION->settings()->get("InstanceDir").toString();
     if (FS::checkProblemticPathJava(QDir(instanceFolder))) {
         QMessageBox warning(this);
-        warning.setText(tr("Your instance folder path contains characters that can break Java (e.g. '!' or ';'). "
+        warning.setText(Nitruran::t("Your instance folder path contains characters that can break Java (e.g. '!' or ';'). "
                            "Please move your instances to a different folder in the settings."));
         warning.setIcon(QMessageBox::Warning);
         warning.exec();
@@ -193,11 +201,11 @@ void NitruranWindow::runInstanceTask(InstanceTask* rawTask)
 void NitruranWindow::runModalTask(Task* task)
 {
     connect(task, &Task::failed, this,
-            [this](QString reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show(); });
+            [this](QString reason) { CustomMessageBox::selectable(this, Nitruran::t("Error"), reason, QMessageBox::Critical)->show(); });
     connect(task, &Task::succeeded, this, [this, task]() {
         const QStringList warnings = task->warnings();
         if (warnings.count())
-            CustomMessageBox::selectable(this, tr("Warnings"), warnings.join('\n'), QMessageBox::Warning)->show();
+            CustomMessageBox::selectable(this, Nitruran::t("Warnings"), warnings.join('\n'), QMessageBox::Warning)->show();
     });
     ProgressDialog loadDialog(this);
     loadDialog.showSkipButton();
@@ -226,4 +234,31 @@ void NitruranWindow::processURLs(QList<QUrl> urls)
         addInstance(url.isLocalFile() ? url.toLocalFile() : url.toString(), extra);
         break;  // like the original: only one dropped file
     }
+}
+
+// First launch: if Prism Launcher / mlcmLauncher data exists next to ours, offer to import it once.
+void NitruranWindow::offerSyncOnFirstRun()
+{
+    auto* s = APPLICATION->settings();
+    if (!s->contains("NitruranSyncOffered"))
+        s->registerSetting("NitruranSyncOffered", false);
+    if (s->get("NitruranSyncOffered").toBool())
+        return;
+    const auto sources = SyncDialog::detectSources();
+    s->set("NitruranSyncOffered", true);  // ask only once, even if the app closes while the box is open
+    if (sources.isEmpty())
+        return;
+
+    QStringList names;
+    for (const auto& src : sources)
+        names << src.displayName;
+    QMessageBox box(this);
+    box.setIcon(QMessageBox::Question);
+    box.setWindowTitle(Nitruran::t("Other launcher data found"));
+    box.setText(Nitruran::t("Nitruran found data from %1. Import it now?").arg(names.join(QStringLiteral(" / "))));
+    auto* importBtn = box.addButton(Nitruran::t("Import"), QMessageBox::AcceptRole);
+    box.addButton(Nitruran::t("Later"), QMessageBox::RejectRole);
+    box.exec();
+    if (box.clickedButton() == importBtn)
+        SyncDialog(this).exec();
 }

@@ -7,6 +7,7 @@
 #include <QPainter>
 
 #include "Application.h"
+#include "NitruranI18n.h"
 #include "NitruranStyle.h"
 #include "InstanceList.h"
 #include "icons/IconList.h"
@@ -60,9 +61,9 @@ void InstanceCardDelegate::paint(QPainter* p, const QStyleOptionViewItem& opt, c
     p->setFont(opt.font);
     QString sub;
     if (inst->lastLaunch() > 0)
-        sub = QObject::tr("Played %1").arg(QDateTime::fromMSecsSinceEpoch(inst->lastLaunch()).date().toString(Qt::ISODate));
+        sub = Nitruran::t("Played %1").arg(QDateTime::fromMSecsSinceEpoch(inst->lastLaunch()).date().toString(Qt::ISODate));
     else
-        sub = QObject::tr("Never played");
+        sub = Nitruran::t("Never played");
     p->drawText(QRect(card.left() + 14, card.bottom() - 36, card.width() - 14 - 60, 24), Qt::AlignLeft | Qt::AlignVCenter, sub);
 
     // play / running button

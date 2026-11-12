@@ -7,6 +7,7 @@
 #include <QVBoxLayout>
 
 #include "Application.h"
+#include "NitruranI18n.h"
 #include "InstanceCardDelegate.h"
 #include "InstanceList.h"
 #include "minecraft/MinecraftInstance.h"
@@ -96,7 +97,7 @@ void LibraryPage::onContextMenu(const QPoint& pos)
     if (!inst)
         return;
     QMenu menu(this);
-    menu.addAction(inst->isRunning() ? tr("Stop") : tr("Play"), this, [this, inst] { onPlay(inst); });
-    menu.addAction(tr("Edit instance"), this, [inst] { APPLICATION->showInstanceWindow(inst); });
+    menu.addAction(inst->isRunning() ? Nitruran::t("Stop") : Nitruran::t("Play"), this, [this, inst] { onPlay(inst); });
+    menu.addAction(Nitruran::t("Edit instance"), this, [inst] { APPLICATION->showInstanceWindow(inst); });
     menu.exec(m_view->viewport()->mapToGlobal(pos));
 }

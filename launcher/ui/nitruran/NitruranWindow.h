@@ -31,6 +31,7 @@ class NitruranWindow : public QMainWindow {
     void closeEvent(QCloseEvent* event) override;
 
    private:
+    void offerSyncOnFirstRun();
     QToolButton* addNavButton(const QString& glyph, const QString& label, const QString& tooltip, bool checkable);
     void addInstance(const QString& url = QString(), const QMap<QString, QString>& extraInfo = {});
     void runInstanceTask(InstanceTask* rawTask);
