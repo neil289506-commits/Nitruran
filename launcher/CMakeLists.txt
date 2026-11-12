@@ -808,6 +808,13 @@ SET(LAUNCHER_SOURCES
     # GUI - windows
     ui/MainWindow.h
     ui/MainWindow.cpp
+    ui/nitruran/NitruranStyle.h
+    ui/nitruran/NitruranWindow.h
+    ui/nitruran/NitruranWindow.cpp
+    ui/nitruran/InstanceCardDelegate.h
+    ui/nitruran/InstanceCardDelegate.cpp
+    ui/nitruran/LibraryPage.h
+    ui/nitruran/LibraryPage.cpp
     ui/InstanceWindow.h
     ui/InstanceWindow.cpp
     ui/ViewLogWindow.h

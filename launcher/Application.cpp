@@ -49,7 +49,7 @@
 #include "tasks/Task.h"
 #include "tools/GenericProfiler.h"
 #include "ui/InstanceWindow.h"
-#include "ui/MainWindow.h"
+#include "ui/nitruran/NitruranWindow.h"
 #include "ui/ToolTipFilter.h"
 #include "ui/ViewLogWindow.h"
 
@@ -1698,14 +1698,14 @@ void Application::ShowGlobalSettings(class QWidget* parent, QString openPage)
     }
 }
 
-MainWindow* Application::showMainWindow(bool minimized)
+NitruranWindow* Application::showMainWindow(bool minimized)
 {
     if (m_mainWindow) {
         m_mainWindow->setWindowState(m_mainWindow->windowState() & ~Qt::WindowMinimized);
         m_mainWindow->raise();
         m_mainWindow->activateWindow();
     } else {
-        m_mainWindow = new MainWindow();
+        m_mainWindow = new NitruranWindow();
         m_mainWindow->restoreState(QByteArray::fromBase64(APPLICATION->settings()->get("MainWindowState").toString().toUtf8()));
         m_mainWindow->restoreGeometry(QByteArray::fromBase64(APPLICATION->settings()->get("MainWindowGeometry").toString().toUtf8()));
 
@@ -1716,8 +1716,8 @@ MainWindow* Application::showMainWindow(bool minimized)
         }
 
         m_mainWindow->checkInstancePathForProblems();
-        connect(this, &Application::updateAllowedChanged, m_mainWindow, &MainWindow::updatesAllowedChanged);
-        connect(m_mainWindow, &MainWindow::isClosing, this, [this] {
+        connect(this, &Application::updateAllowedChanged, m_mainWindow, &NitruranWindow::updatesAllowedChanged);
+        connect(m_mainWindow, &NitruranWindow::isClosing, this, [this] {
             m_mainWindow = nullptr;
             on_windowClose();
         });
