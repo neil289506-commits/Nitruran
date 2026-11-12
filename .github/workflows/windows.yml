@@ -1,0 +1,110 @@
+name: Windows build
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+    inputs:
+      build-type:
+        description: Type of build (Release or Debug)
+        type: string
+        default: Release
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths-ignore: ['docs/**', '**.md']
+
+permissions: {}
+
+jobs:
+  build:
+    name: Build (Windows MSVC, Qt 6.11.2)
+    runs-on: windows-2022
+    permissions:
+      contents: read
+      packages: write # vcpkg binary cache (GitHub Packages / NuGet)
+    defaults:
+      run:
+        shell: bash
+    env:
+      ARTIFACT_NAME: Windows-MSVC-Qt6
+      BUILD_PLATFORM: nitruran
+      BUILD_TYPE: ${{ inputs.build-type || 'Release' }}
+      CMAKE_PRESET: ci
+      # Repo secret: Settings > Secrets and variables > Actions > MSA_CLIENT_ID
+      MSA_CLIENT_ID: ${{ secrets.MSA_CLIENT_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: Require Microsoft client ID
+        run: |
+          if [ -z "$MSA_CLIENT_ID" ]; then
+            echo "::error::Secret MSA_CLIENT_ID is not set. Add it under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Setup dependencies
+        id: setup-dependencies
+        uses: ./.github/actions/setup-dependencies
+        with:
+          build-type: ${{ env.BUILD_TYPE }}
+          artifact-name: Windows-MSVC
+          vcvars-arch: amd64
+          qt-version: 6.11.2
+
+      - name: Configure project
+        run: |
+          cmake --preset "$CMAKE_PRESET" \
+            -D VCPKG_HOST_TRIPLET="$VCPKG_TRIPLET" -D VCPKG_TARGET_TRIPLET="$VCPKG_TRIPLET" \
+            -D Launcher_MSA_CLIENT_ID="$MSA_CLIENT_ID" \
+            -D Launcher_APP_BINARY_NAME=nitruran \
+            -D Launcher_BUG_TRACKER_URL="https://github.com/${{ github.repository }}/issues" \
+            -D Launcher_WARNING_AS_ERROR=OFF
+
+      - name: Build
+        run: cmake --build --preset "$CMAKE_PRESET" --config "$BUILD_TYPE"
+
+      - name: Test
+        run: ctest --preset "$CMAKE_PRESET" --build-config "$BUILD_TYPE"
+
+      - name: Install and package
+        shell: pwsh
+        run: |
+          cmake --install build --config $env:BUILD_TYPE
+          Copy-Item -Recurse install install-portable
+          cmake --install build --config $env:BUILD_TYPE --prefix install-portable --component portable
+          Compress-Archive -Path install\* -DestinationPath Nitruran-Windows-x64.zip
+          Compress-Archive -Path install-portable\* -DestinationPath Nitruran-Windows-x64-portable.zip
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nitruran-Windows-x64
+          path: |
+            Nitruran-Windows-x64.zip
+            Nitruran-Windows-x64-portable.zip
+
+  release:
+    name: Publish release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Nitruran-Windows-x64
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --generate-notes \
+            Nitruran-Windows-x64.zip Nitruran-Windows-x64-portable.zip

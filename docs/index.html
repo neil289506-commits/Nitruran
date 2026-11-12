@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nitruran — a modern Minecraft launcher</title>
+<meta name="description" content="Nitruran: a Modrinth-App-inspired interface on the Prism Launcher core. Open source, Windows first.">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<style>
+:root{--s1:#16181c;--s2:#1d1f23;--s3:#27292e;--s4:#34363c;--text:#b0bac5;--text2:#96a2b0;--pri:#fff;--brand:#1bd96a;--glow:#b6ff3b;--border:rgba(193,190,209,.14);--r:12px}
+@media (prefers-color-scheme: light){:root{--s1:#f4f6f8;--s2:#fff;--s3:#eef1f4;--s4:#dfe4ea;--text:#3a4552;--text2:#5d6b7a;--pri:#0e1512;--brand:#0f8642;--glow:#4c9a00;--border:rgba(30,40,50,.14)}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--s1);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI","Noto Sans TC","Microsoft JhengHei",sans-serif}
+a{color:var(--brand);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--s1) 85%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+nav .wrap{display:flex;align-items:center;gap:18px;height:60px}
+nav .brand{display:flex;align-items:center;gap:10px;color:var(--pri);font-weight:700;font-size:18px}
+nav .brand img{width:30px;height:30px}nav .sp{flex:1}
+nav a.l{color:var(--text)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--r);font-weight:600;border:1px solid var(--border);background:var(--s3);color:var(--pri)}
+.btn:hover{background:var(--s4);text-decoration:none}
+.btn.pri{background:var(--brand);color:#04110a;border-color:transparent}.btn.pri:hover{filter:brightness(1.08)}
+.hero{padding:72px 0 40px;text-align:center;background:radial-gradient(60% 55% at 50% 0,color-mix(in srgb,var(--glow) 18%,transparent),transparent 70%)}
+.hero img.logo{width:112px;height:112px}
+.hero h1{margin:16px 0 8px;color:var(--pri);font-size:clamp(34px,6vw,56px);letter-spacing:-.02em}
+.hero p.lead{max-width:640px;margin:0 auto 26px;font-size:18px;color:var(--text)}
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid var(--border);background:var(--s2);color:var(--text2);font-size:13px;margin-bottom:14px}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+section{padding:48px 0}section h2{color:var(--pri);font-size:28px;margin:0 0 6px}
+section p.sub{margin:0 0 26px;color:var(--text2)}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.card h3{margin:0 0 6px;color:var(--pri);font-size:17px}.card p{margin:0;color:var(--text2);font-size:15px}
+.shots{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.shots figure{margin:0;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.shots img{display:block;width:100%;height:auto}.shots figcaption{padding:10px 14px;color:var(--text2);font-size:14px}
+.note{background:var(--s2);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:var(--r);padding:14px 18px;color:var(--text2)}
+footer{border-top:1px solid var(--border);padding:28px 0 40px;color:var(--text2);font-size:14px}
+footer p{margin:6px 0}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <a class="brand" href="#"><img src="assets/logo.svg" alt="">Nitruran</a><span class="sp"></span>
+  <a class="l" href="#features">Features</a><a class="l" href="#preview">Preview</a><a class="l" href="#about">About</a>
+  <a class="btn" href="https://github.com/neil289506-commits/Nitruran">GitHub</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <img class="logo" src="assets/logo.svg" alt="Nitruran logo">
+  <div><span class="badge">Early preview · Windows first</span></div>
+  <h1>Nitruran</h1>
+  <p class="lead">A modern Minecraft launcher: a clean sidebar-and-cards interface on top of Prism Launcher’s proven core.</p>
+  <div class="cta">
+    <a class="btn pri" href="https://github.com/neil289506-commits/Nitruran/releases/latest">Download for Windows</a>
+    <a class="btn" href="https://github.com/neil289506-commits/Nitruran">View source</a>
+  </div>
+</div></header>
+
+<main class="wrap">
+<section id="features">
+  <h2>What you get</h2><p class="sub">New look, familiar engine.</p>
+  <div class="grid">
+    <div class="card"><h3>Modern interface</h3><p>Left sidebar, instance cards with one-click play, and a Home page that puts your recent worlds first.</p></div>
+    <div class="card"><h3>Prism core</h3><p>Instances, Java handling, mod loaders, accounts and launching all come from Prism Launcher’s codebase.</p></div>
+    <div class="card"><h3>Mods from both sides</h3><p>Browse Modrinth and CurseForge in one place. Smarter cross-platform fallback is in development.</p></div>
+    <div class="card"><h3>Bring your instances</h3><p>First-run sync from Prism Launcher and mlcmLauncher is planned, so you don’t start from zero.</p></div>
+    <div class="card"><h3>Open source</h3><p>Licensed under GPL-3.0, with Prism Launcher’s original copyright notices kept intact.</p></div>
+    <div class="card"><h3>Your own sign-in ID</h3><p>Built with its own approved Microsoft application ID, not borrowed from another launcher.</p></div>
+  </div>
+</section>
+
+<section id="preview">
+  <h2>Preview</h2><p class="sub">Design previews rendered with sample instances; real screenshots will replace them.</p>
+  <div class="shots">
+    <figure><img src="assets/preview-home.png" alt="Nitruran Home page preview" loading="lazy"><figcaption>Home — jump back into recent instances</figcaption></figure>
+    <figure><img src="assets/preview-library.png" alt="Nitruran Library page preview" loading="lazy"><figcaption>Library — all instances as cards</figcaption></figure>
+  </div>
+</section>
+
+<section id="about">
+  <h2>About</h2>
+  <div class="note">Nitruran is an independent fork of <a href="https://github.com/PrismLauncher/PrismLauncher">Prism Launcher</a> (GPL-3.0). Its interface follows the open-source design tokens of the Modrinth app; Modrinth’s name and logo are not used. Nitruran is not affiliated with or endorsed by Mojang, Microsoft, Prism Launcher, Modrinth or CurseForge. Minecraft is a trademark of Mojang Synergies AB.</div>
+</section>
+</main>
+
+<footer><div class="wrap">
+  <p>© Nitruran contributors. Released under the GNU GPL v3 — see the repository for full licence texts.</p>
+  <p><a href="https://github.com/neil289506-commits/Nitruran">Source</a> · <a href="https://github.com/neil289506-commits/Nitruran/issues">Report an issue</a></p>
+</div></footer>
+</body>
+</html>

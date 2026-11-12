@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <title>Nitruran</title>
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="55%">
+      <stop offset="0" stop-color="#b6ff3b" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#b6ff3b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="#101312"/>
+  <circle cx="128" cy="128" r="118" fill="url(#glow)"/>
+  <!-- electron orbit (behind the block) -->
+  <g transform="rotate(-28 128 128)">
+    <ellipse cx="128" cy="128" rx="112" ry="34" fill="none" stroke="#b6ff3b" stroke-opacity="0.85" stroke-width="4"/>
+    <circle cx="240" cy="128" r="7" fill="#e3ff9a"/>
+  </g>
+  <!-- block: three facets -->
+  <polygon points="59,88 128,128 128,208 59,168" fill="#1bd96a"/>
+  <polygon points="128,128 197,88 197,168 128,208" fill="#0f8642"/>
+  <polygon points="128,48 197,88 128,128 59,88" fill="#9dff5c"/>
+  <!-- N cut-out -->
+  <path d="M96 156V100H110L146 138V100H160V156H146L110 118V156Z" fill="#0e1512" fill-opacity="0.92"/>
+</svg>
