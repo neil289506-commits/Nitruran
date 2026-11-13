@@ -87,22 +87,38 @@ jobs:
       - name: Test
         run: ctest --preset "$CMAKE_PRESET" --build-config "$BUILD_TYPE"
 
-      - name: Install and package
+      - name: Package portable build and installer
         shell: pwsh
+        env:
+          NSCURL_VERSION: v24.9.26.122
+          NSCURL_SHA256: AEE6C4BE3CB6455858E9C1EE4B3AFE0DB9960FA03FE99CCDEDC28390D57CCBB0
         run: |
           cmake --install build --config $env:BUILD_TYPE
           Copy-Item -Recurse install install-portable
           cmake --install build --config $env:BUILD_TYPE --prefix install-portable --component portable
-          Compress-Archive -Path install\* -DestinationPath Nitruran-Windows-x64.zip
-          Compress-Archive -Path install-portable\* -DestinationPath Nitruran-Windows-x64-portable.zip
+          Compress-Archive -Path install-portable\* -DestinationPath Nitruran-Windows-x64-Portable.zip
+
+          New-Item -ItemType Directory -Force -Path NSISPlugins | Out-Null
+          Invoke-WebRequest `
+            -Uri "https://github.com/negrutiu/nsis-nscurl/releases/download/$env:NSCURL_VERSION/NScurl.zip" `
+            -OutFile NSISPlugins\NScurl.zip
+          if ((Get-FileHash NSISPlugins\NScurl.zip -Algorithm SHA256).Hash -ne $env:NSCURL_SHA256) {
+            throw "NScurl.zip SHA256 mismatch"
+          }
+          Expand-Archive -Path NSISPlugins\NScurl.zip -DestinationPath NSISPlugins\NScurl -Force
+
+          Push-Location install
+          makensis -NOCD "../build/program_info/win_install.nsi"
+          Pop-Location
+          Move-Item Nitruran-Setup.exe Nitruran-Windows-x64-Installer.exe
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Nitruran-Windows-x64
           path: |
-            Nitruran-Windows-x64.zip
-            Nitruran-Windows-x64-portable.zip
+            Nitruran-Windows-x64-Portable.zip
+            Nitruran-Windows-x64-Installer.exe
 
   release:
     name: Publish release
@@ -120,4 +136,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --generate-notes \
-            Nitruran-Windows-x64.zip Nitruran-Windows-x64-portable.zip
+            Nitruran-Windows-x64-Installer.exe Nitruran-Windows-x64-Portable.zip
