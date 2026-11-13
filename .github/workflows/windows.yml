@@ -65,6 +65,12 @@ jobs:
           vcvars-arch: amd64
           qt-version: 6.11.2
 
+      - name: Prepare Windows resources
+        run: |
+          for suffix in rc.in qrc.in manifest.in ico; do
+            cp "program_info/prismlauncher.$suffix" "program_info/nitruran.$suffix"
+          done
+
       - name: Configure project
         run: |
           cmake --preset "$CMAKE_PRESET" \
