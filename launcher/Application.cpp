@@ -1273,7 +1273,8 @@ bool Application::createSetupWizard()
     bool themeInterventionRequired = !validWidgets || !validIcons;
     bool wizardRequired = javaRequired || languageRequired || pasteInterventionRequired || themeInterventionRequired || askjava || login;
     if (wizardRequired) {
-        const bool darkMode = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark;
+        // Nitruran ships a dark theme as its default, whatever the system colour scheme is
+        const bool darkMode = true;
         // set default theme after going into theme wizard
         if (!validIcons) {
             QString defaultIconTheme;
@@ -1286,12 +1287,7 @@ bool Application::createSetupWizard()
             settings()->set("IconTheme", defaultIconTheme);
         }
         if (!validWidgets) {
-#if defined(Q_OS_LINUX)
-            const QString style = "system";
-#else
-            const QString style = darkMode ? QStringLiteral("dark") : QStringLiteral("bright");
-
-#endif
+            const QString style = QStringLiteral("nitruran");
 
             settings()->set("ApplicationTheme", style);
         }

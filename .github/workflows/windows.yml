@@ -135,5 +135,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --generate-notes \
-            Nitruran-Windows-x64-Installer.exe Nitruran-Windows-x64-Portable.zip
+          # The release may already exist (created or edited by hand): upload to it instead of failing.
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --clobber \
+              Nitruran-Windows-x64-Installer.exe Nitruran-Windows-x64-Portable.zip
+          else
+            gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --generate-notes \
+              Nitruran-Windows-x64-Installer.exe Nitruran-Windows-x64-Portable.zip
+          fi
