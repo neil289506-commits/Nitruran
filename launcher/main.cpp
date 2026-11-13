@@ -56,7 +56,11 @@ int main(int argc, char* argv[])
             Q_INIT_RESOURCE(multimc);
             Q_INIT_RESOURCE(backgrounds);
             Q_INIT_RESOURCE(documents);
+#if defined(LAUNCHER_QT_RESOURCE_NAME_NITRURAN)
+            Q_INIT_RESOURCE(nitruran);
+#else
             Q_INIT_RESOURCE(prismlauncher);
+#endif
 
             Q_INIT_RESOURCE(pe_dark);
             Q_INIT_RESOURCE(pe_light);

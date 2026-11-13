@@ -1325,6 +1325,9 @@ if(APPLE)
 endif()
 
 add_executable(${Launcher_Name} MACOSX_BUNDLE WIN32 main.cpp ${LAUNCHER_RCS})
+if(Launcher_APP_BINARY_NAME STREQUAL "nitruran")
+    target_compile_definitions(${Launcher_Name} PRIVATE LAUNCHER_QT_RESOURCE_NAME_NITRURAN)
+endif()
 target_link_options(${Launcher_Name} PRIVATE
     # /MANIFEST:NO disables generating a manifest file, we instead provide our own
     $<$<STREQUAL:${CMAKE_CXX_COMPILER_FRONTEND_VARIANT},MSVC>:/MANIFEST:NO>
