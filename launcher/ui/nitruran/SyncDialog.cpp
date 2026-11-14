@@ -57,8 +57,10 @@ SyncDialog::SyncDialog(QWidget* parent) : QDialog(parent)
         c->setChecked(true);
         v->addWidget(c);
     }
+    // Accounts are tied to the application ID that signed them in, so they usually need a fresh sign-in anyway.
+    m_accounts->setChecked(false);
     auto* note = new QLabel(t("Existing items are never overwritten.") + QStringLiteral("\n") +
-                                t("Accounts from Prism Launcher may need to sign in again."),
+                                t("Accounts are not copied by default: they are tied to the app that signed them in, so sign in again in Nitruran."),
                             this);
     note->setWordWrap(true);
     v->addWidget(note);

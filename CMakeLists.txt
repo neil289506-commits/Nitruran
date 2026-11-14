@@ -186,7 +186,7 @@ set(Launcher_LEGACY_FMLLIBS_BASE_URL "https://files.prismlauncher.org/fmllibs/" 
 ######## Set version numbers ########
 set(Launcher_VERSION_MAJOR 12)
 set(Launcher_VERSION_MINOR 0)
-set(Launcher_VERSION_PATCH 0)
+set(Launcher_VERSION_PATCH 1)
 
 set(Launcher_VERSION_NAME "${Launcher_VERSION_MAJOR}.${Launcher_VERSION_MINOR}.${Launcher_VERSION_PATCH}")
 set(Launcher_VERSION_NAME4 "${Launcher_VERSION_MAJOR}.${Launcher_VERSION_MINOR}.${Launcher_VERSION_PATCH}.0")
@@ -196,7 +196,7 @@ set(Launcher_VERSION_NAME4_COMMA "${Launcher_VERSION_MAJOR},${Launcher_VERSION_M
 set(Launcher_BUILD_PLATFORM "unknown" CACHE STRING "A short string identifying the platform that this build was built for. Only used to display in the about dialog.")
 
 # Github repo URL with releases for updater
-set(Launcher_UPDATER_GITHUB_REPO "https://github.com/PrismLauncher/PrismLauncher" CACHE STRING "Base github URL for the updater.")
+set(Launcher_UPDATER_GITHUB_REPO "https://github.com/neil289506-commits/Nitruran" CACHE STRING "Base github URL for the updater.")
 
 # Name to help updater identify valid artifacts
 set(Launcher_BUILD_ARTIFACT "" CACHE STRING "Artifact name to help the updater identify valid artifacts.")
@@ -277,6 +277,8 @@ set(Launcher_MSA_CLIENT_ID "c36a9fb6-4f2a-41ff-90bd-ae7cc92031eb" CACHE STRING "
 # https://support.curseforge.com/en/support/solutions/articles/9000207405-curse-forge-3rd-party-api-terms-and-conditions
 # NOTE: CurseForge requires you to change this if you make any kind of derivative work.
 # This key was issued specifically for Prism Launcher
+set(Launcher_CURSEFORGE_API_KEY_ENCRYPTED "" CACHE STRING "AES-128-CTR encrypted default CurseForge key, base64(iv||ciphertext); produced by tools/encrypt_secret.py")
+set(Launcher_CURSEFORGE_API_KEY_DECRYPT_KEY "" CACHE STRING "base64 AES-128 key for Launcher_CURSEFORGE_API_KEY_ENCRYPTED (bot-proofing only, not a real secret)")
 set(Launcher_CURSEFORGE_API_KEY "" CACHE STRING "API key for the CurseForge platform (Nitruran: supplied by CI secret, never committed)")
 
 set(Launcher_COMPILER_NAME ${CMAKE_CXX_COMPILER_ID})

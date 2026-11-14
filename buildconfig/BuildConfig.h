@@ -157,6 +157,9 @@ class Config {
      * Client API key for CurseForge
      */
     QString FLAME_API_KEY;
+    /// Nitruran: AES-encrypted default key (base64 iv||ciphertext) and its decryption key (base64); see EmbeddedSecret.h
+    QString FLAME_API_KEY_ENCRYPTED;
+    QString FLAME_API_KEY_DECRYPT_KEY;
 
     /**
      * Metadata repository URL prefix

@@ -41,6 +41,7 @@
  */
 
 #include "Application.h"
+#include "EmbeddedSecret.h"
 #include "BuildConfig.h"
 
 #include "DataMigrationTask.h"
@@ -1934,7 +1935,11 @@ QString Application::getFlameAPIKey()
         return keyOverride;
     }
 
-    return BuildConfig.FLAME_API_KEY;
+    // A key passed at build time (CI secret) wins; otherwise use the AES-encrypted default that ships in the source.
+    if (!BuildConfig.FLAME_API_KEY.isEmpty()) {
+        return BuildConfig.FLAME_API_KEY;
+    }
+    return EmbeddedSecret::decrypt(BuildConfig.FLAME_API_KEY_ENCRYPTED, BuildConfig.FLAME_API_KEY_DECRYPT_KEY);
 }
 
 QString Application::getModrinthAPIToken()

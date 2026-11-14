@@ -816,6 +816,8 @@ SET(LAUNCHER_SOURCES
     ui/nitruran/InstanceCardDelegate.h
     ui/nitruran/InstanceCardDelegate.cpp
     ui/nitruran/LibraryPage.h
+    EmbeddedSecret.cpp
+    EmbeddedSecret.h
     ui/nitruran/LibraryPage.cpp
     ui/nitruran/NitruranI18n.h
     ui/nitruran/SyncService.h

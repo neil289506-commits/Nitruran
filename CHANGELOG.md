@@ -7,11 +7,24 @@ from upstream. Current base: upstream `develop` at `1a6438dcf` (12.0.0-pre1 plus
 ## [Unreleased]
 
 ### Added
+- The in-app **updater now follows this repository** (`Launcher_UPDATER_GITHUB_REPO`) instead of Prism Launcher's.
+  Release assets must contain `Windows-MSVC` in their name for the updater to accept them, so they are now
+  named `Nitruran-Windows-MSVC-Setup.exe` and `Nitruran-Windows-MSVC-Portable.zip`. The app version is
+  12.0.1, so the next release must be tagged higher than the 12.0.0 reported by v11.1.1 builds (for example
+  `v12.0.1`). Read from the updater's source; not yet exercised end to end.
+- **AES-encrypted default CurseForge key**: the source can carry the key as AES-128-CTR text
+  (`Launcher_CURSEFORGE_API_KEY_ENCRYPTED` / `_DECRYPT_KEY`, produced by `tools/encrypt_secret.py`) so that
+  automated scrapers do not find a plain key. This is bot-proofing only — the decryption key ships with the
+  source and binary. A key passed at build time (the `CURSEFORGE_API_KEY` secret) overrides it, and users can
+  override both under Settings → API.
 - Built-in **Nitruran theme** (Modrinth-app-inspired dark palette) that styles every dialog — settings, new
   instance, instance window — not just the main window. It is the default for new installs; existing installs keep
   their current theme until changed under Settings → Appearance.
 
 ### Changed
+- First-run / sidebar sync: **accounts are no longer ticked by default**, because they are tied to the app that
+  signed them in and normally need a fresh sign-in.
+- The `CURSEFORGE_API_KEY` secret is now optional in CI (it overrides the embedded default when set).
 - Number fields no longer show stray spin arrows under the new theme (use keyboard or mouse wheel).
 
 ### Fixed
@@ -50,14 +63,11 @@ from upstream. Current base: upstream `develop` at `1a6438dcf` (12.0.0-pre1 plus
 
 ## Known issues
 
-- **Updater points at Prism.** In CI-built releases the in-app updater is enabled and, by default, follows
-  `PrismLauncher/PrismLauncher` (`Launcher_UPDATER_GITHUB_REPO`). This comes from reading the build files; it
-  has not been exercised. Until it is changed, do not use "Check for updates".
 - `Launcher_MSA_CLIENT_ID` still defaults to **Prism's** client ID in `CMakeLists.txt`. Always pass your own
   when building (see below).
 - Discover (new-instance dialog), settings and the instance window are still Prism's pages, only restyled.
 - Screenshots in the README and on the website are design previews rendered with sample data.
-- Accounts imported from another launcher were signed in with that launcher's client ID and may need signing
+- Accounts copied from another launcher were signed in with that launcher's client ID and may need signing
   in again.
 - Windows only. Linux and macOS builds are not provided.
 
@@ -79,7 +89,8 @@ command lines below are adapted from it and have not been run on a separate mach
 ### You must supply
 - `Launcher_MSA_CLIENT_ID` — your own Microsoft application ID that Mojang has approved. Do not rely on the
   default; it belongs to Prism Launcher.
-- `Launcher_CURSEFORGE_API_KEY` — your own CurseForge API key. Never commit it.
+- `Launcher_CURSEFORGE_API_KEY` — optional: your own CurseForge API key. Without it the AES-encrypted default
+  in `CMakeLists.txt` is used (if one is set); users can also enter a key under Settings → API.
 
 ### Steps
 ```powershell

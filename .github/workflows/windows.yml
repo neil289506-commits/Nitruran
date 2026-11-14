@@ -51,10 +51,6 @@ jobs:
             echo "::error::Secret MSA_CLIENT_ID is not set. Add it under Settings > Secrets and variables > Actions."
             exit 1
           fi
-          if [ -z "$CURSEFORGE_API_KEY" ]; then
-            echo "::error::Secret CURSEFORGE_API_KEY is not set. Add it under Settings > Secrets and variables > Actions."
-            exit 1
-          fi
 
       - name: Setup dependencies
         id: setup-dependencies
@@ -78,6 +74,7 @@ jobs:
             -D Launcher_MSA_CLIENT_ID="$MSA_CLIENT_ID" \
             -D Launcher_CURSEFORGE_API_KEY="$CURSEFORGE_API_KEY" \
             -D Launcher_APP_BINARY_NAME=nitruran \
+            -D Launcher_UPDATER_GITHUB_REPO="https://github.com/${{ github.repository }}" \
             -D Launcher_BUG_TRACKER_URL="https://github.com/${{ github.repository }}/issues" \
             -D Launcher_WARNING_AS_ERROR=OFF
 
@@ -96,7 +93,7 @@ jobs:
           cmake --install build --config $env:BUILD_TYPE
           Copy-Item -Recurse install install-portable
           cmake --install build --config $env:BUILD_TYPE --prefix install-portable --component portable
-          Compress-Archive -Path install-portable\* -DestinationPath Nitruran-Windows-x64-Portable.zip
+          Compress-Archive -Path install-portable\* -DestinationPath Nitruran-Windows-MSVC-Portable.zip
 
           New-Item -ItemType Directory -Force -Path NSISPlugins | Out-Null
           Invoke-WebRequest `
@@ -110,15 +107,15 @@ jobs:
           Push-Location install
           makensis -NOCD "../build/program_info/win_install.nsi"
           Pop-Location
-          Move-Item Nitruran-Setup.exe Nitruran-Windows-x64-Installer.exe
+          Move-Item Nitruran-Setup.exe Nitruran-Windows-MSVC-Setup.exe
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Nitruran-Windows-x64
           path: |
-            Nitruran-Windows-x64-Portable.zip
-            Nitruran-Windows-x64-Installer.exe
+            Nitruran-Windows-MSVC-Portable.zip
+            Nitruran-Windows-MSVC-Setup.exe
 
   release:
     name: Publish release
@@ -138,8 +135,8 @@ jobs:
           # The release may already exist (created or edited by hand): upload to it instead of failing.
           if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --clobber \
-              Nitruran-Windows-x64-Installer.exe Nitruran-Windows-x64-Portable.zip
+              Nitruran-Windows-MSVC-Setup.exe Nitruran-Windows-MSVC-Portable.zip
           else
             gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --generate-notes \
-              Nitruran-Windows-x64-Installer.exe Nitruran-Windows-x64-Portable.zip
+              Nitruran-Windows-MSVC-Setup.exe Nitruran-Windows-MSVC-Portable.zip
           fi
