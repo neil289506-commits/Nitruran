@@ -45,13 +45,6 @@ jobs:
           submodules: true
           fetch-depth: 0
 
-      - name: Require secrets
-        run: |
-          if [ -z "$MSA_CLIENT_ID" ]; then
-            echo "::error::Secret MSA_CLIENT_ID is not set. Add it under Settings > Secrets and variables > Actions."
-            exit 1
-          fi
-
       - name: Setup dependencies
         id: setup-dependencies
         uses: ./.github/actions/setup-dependencies
@@ -69,14 +62,18 @@ jobs:
 
       - name: Configure project
         run: |
+          # Optional overrides: only pass a secret when it is set, so an empty secret never blanks the defaults
+          # in CMakeLists.txt (Nitruran's client ID and the AES-encrypted CurseForge key).
+          EXTRA=()
+          if [ -n "$MSA_CLIENT_ID" ]; then EXTRA+=(-D "Launcher_MSA_CLIENT_ID=$MSA_CLIENT_ID"); fi
+          if [ -n "$CURSEFORGE_API_KEY" ]; then EXTRA+=(-D "Launcher_CURSEFORGE_API_KEY=$CURSEFORGE_API_KEY"); fi
           cmake --preset "$CMAKE_PRESET" \
             -D VCPKG_HOST_TRIPLET="$VCPKG_TRIPLET" -D VCPKG_TARGET_TRIPLET="$VCPKG_TRIPLET" \
-            -D Launcher_MSA_CLIENT_ID="$MSA_CLIENT_ID" \
-            -D Launcher_CURSEFORGE_API_KEY="$CURSEFORGE_API_KEY" \
             -D Launcher_APP_BINARY_NAME=nitruran \
             -D Launcher_UPDATER_GITHUB_REPO="https://github.com/${{ github.repository }}" \
             -D Launcher_BUG_TRACKER_URL="https://github.com/${{ github.repository }}/issues" \
-            -D Launcher_WARNING_AS_ERROR=OFF
+            -D Launcher_WARNING_AS_ERROR=OFF \
+            "${EXTRA[@]}"
 
       - name: Build
         run: cmake --build --preset "$CMAKE_PRESET" --config "$BUILD_TYPE"

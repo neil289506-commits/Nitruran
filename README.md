@@ -31,12 +31,10 @@ A Minecraft launcher with a modern, Modrinth-App-inspired interface, running on 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and build-from-source steps.
 
 ## Build
-GitHub Actions builds Windows (MSVC, Qt 6.11.2) — see `.github/workflows/windows.yml`.
-Add two repository secrets first (Settings → Secrets and variables → Actions):
-
-* `MSA_CLIENT_ID` — your Microsoft/Mojang-approved application ID.
-* `CURSEFORGE_API_KEY` — your CurseForge API key for applications. It is never stored in the source; the build embeds it
-  (anyone can extract an embedded key from a binary, so treat it as shared with your users).
+GitHub Actions builds Windows (MSVC, Qt 6.11.2) — see `.github/workflows/windows.yml` and the build-from-source steps
+in [CHANGELOG.md](CHANGELOG.md). Nitruran's Microsoft client ID and an AES-encrypted default CurseForge key are built
+in; the repository secrets `MSA_CLIENT_ID` and `CURSEFORGE_API_KEY` are optional overrides. If the built-in
+CurseForge key ever stops working, enter your own under Settings → API.
 
 ## Credits and licence
 Nitruran is a fork of Prism Launcher (GPL-3.0, see `COPYING.md` and `LICENSE`), whose copyright

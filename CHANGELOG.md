@@ -63,8 +63,6 @@ from upstream. Current base: upstream `develop` at `1a6438dcf` (12.0.0-pre1 plus
 
 ## Known issues
 
-- `Launcher_MSA_CLIENT_ID` still defaults to **Prism's** client ID in `CMakeLists.txt`. Always pass your own
-  when building (see below).
 - Discover (new-instance dialog), settings and the instance window are still Prism's pages, only restyled.
 - Screenshots in the README and on the website are design previews rendered with sample data.
 - Accounts copied from another launcher were signed in with that launcher's client ID and may need signing
@@ -86,9 +84,9 @@ command lines below are adapted from it and have not been run on a separate mach
 - Git (the repository uses submodules, including vcpkg)
 - Optional, for the installer: NSIS (`makensis`)
 
-### You must supply
-- `Launcher_MSA_CLIENT_ID` — your own Microsoft application ID that Mojang has approved. Do not rely on the
-  default; it belongs to Prism Launcher.
+### Defaults and overrides
+- `Launcher_MSA_CLIENT_ID` — defaults to Nitruran's approved client ID. If you fork Nitruran, pass your own
+  Mojang-approved application ID; do not reuse this one for a different app.
 - `Launcher_CURSEFORGE_API_KEY` — optional: your own CurseForge API key. Without it the AES-encrypted default
   in `CMakeLists.txt` is used (if one is set); users can also enter a key under Settings → API.
 
@@ -105,8 +103,8 @@ foreach ($s in "rc.in","qrc.in","manifest.in","ico") {
 cmake --preset default `
   -D CMAKE_PREFIX_PATH="C:\Qt\6.11.2\msvc2022_64" `
   -D VCPKG_HOST_TRIPLET=x64-windows -D VCPKG_TARGET_TRIPLET=x64-windows `
-  -D Launcher_MSA_CLIENT_ID="<your approved client id>" `
-  -D Launcher_CURSEFORGE_API_KEY="<your CurseForge key>" `
+  -D Launcher_MSA_CLIENT_ID="<your approved client id>" `        # optional: overrides the default
+  -D Launcher_CURSEFORGE_API_KEY="<your CurseForge key>" `       # optional: overrides the default
   -D Launcher_APP_BINARY_NAME=nitruran
 
 cmake --build --preset default --config Release
@@ -120,8 +118,8 @@ Notes:
   treats warnings as errors; CI overrides that with `-D Launcher_WARNING_AS_ERROR=OFF`.
 - Portable build: `cmake --install build --config Release --prefix install-portable --component portable`
   after copying `install` to `install-portable`.
-- GitHub Actions: add the repository secrets `MSA_CLIENT_ID` and `CURSEFORGE_API_KEY`, then run the
-  "Windows build" workflow. Pushing a tag that starts with `v` also publishes a release.
+- GitHub Actions: run the "Windows build" workflow. Repository secrets `MSA_CLIENT_ID` and `CURSEFORGE_API_KEY`
+  are optional overrides. Pushing a tag that starts with `v` also publishes a release.
 
 [Unreleased]: https://github.com/neil289506-commits/Nitruran/compare/v11.1.1...HEAD
 [v11.1.1]: https://github.com/neil289506-commits/Nitruran/releases/tag/v11.1.1

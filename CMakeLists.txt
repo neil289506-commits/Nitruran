@@ -271,14 +271,14 @@ endif()
 
 # By using this key in your builds you accept the terms of use laid down in
 # https://docs.microsoft.com/en-us/legal/microsoft-identity-platform/terms-of-use
-set(Launcher_MSA_CLIENT_ID "c36a9fb6-4f2a-41ff-90bd-ae7cc92031eb" CACHE STRING "Client ID you can get from Microsoft Identity Platform when you register an application")
+set(Launcher_MSA_CLIENT_ID "fbaf14ea-f9bc-4361-9b97-66698fe420d4" CACHE STRING "Client ID you can get from a Microsoft Entra Application (Nitruran default; override with -D or the MSA_CLIENT_ID secret)")
 
 # By using this key in your builds you accept the terms and conditions laid down in
 # https://support.curseforge.com/en/support/solutions/articles/9000207405-curse-forge-3rd-party-api-terms-and-conditions
 # NOTE: CurseForge requires you to change this if you make any kind of derivative work.
 # This key was issued specifically for Prism Launcher
-set(Launcher_CURSEFORGE_API_KEY_ENCRYPTED "" CACHE STRING "AES-128-CTR encrypted default CurseForge key, base64(iv||ciphertext); produced by tools/encrypt_secret.py")
-set(Launcher_CURSEFORGE_API_KEY_DECRYPT_KEY "" CACHE STRING "base64 AES-128 key for Launcher_CURSEFORGE_API_KEY_ENCRYPTED (bot-proofing only, not a real secret)")
+set(Launcher_CURSEFORGE_API_KEY_ENCRYPTED "6RBToJAxJuEZt4mZP+T1P/AAtDVWPMjRa/rLFR+ikWwjw7rSVMOJVGqD7H8kuw6vEsoMFsBGD+n7DT3rR82kcjU6ZJsvaEXGx3zCmQ==" CACHE STRING "AES-128-CTR encrypted default CurseForge key, base64(iv||ciphertext); produced by tools/encrypt_secret.py")
+set(Launcher_CURSEFORGE_API_KEY_DECRYPT_KEY "sbTPtazcYiYbb5HMGDzwWg==" CACHE STRING "base64 AES-128 key for Launcher_CURSEFORGE_API_KEY_ENCRYPTED (bot-proofing only, not a real secret)")
 set(Launcher_CURSEFORGE_API_KEY "" CACHE STRING "API key for the CurseForge platform (Nitruran: supplied by CI secret, never committed)")
 
 set(Launcher_COMPILER_NAME ${CMAKE_CXX_COMPILER_ID})
