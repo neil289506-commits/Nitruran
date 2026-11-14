@@ -28,6 +28,8 @@ A Minecraft launcher with a modern, Modrinth-App-inspired interface, running on 
 | **Instance menu** | **Compact window** |
 | ![Instance menu](docs/assets/screenshot-menu.png) | ![Compact window](docs/assets/screenshot-compact.png) |
 
+See [CHANGELOG.md](CHANGELOG.md) for release notes and build-from-source steps.
+
 ## Build
 GitHub Actions builds Windows (MSVC, Qt 6.11.2) — see `.github/workflows/windows.yml`.
 Add two repository secrets first (Settings → Secrets and variables → Actions):
